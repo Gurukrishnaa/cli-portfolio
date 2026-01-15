@@ -4,9 +4,6 @@
 
 A fully interactive **Terminal Portfolio** that turns your browser into a command-line interface. Built with Next.js, Tailwind CSS, and a love for retro aesthetics.
 
-![PortOS Terminal](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDdtY2J6eXF6YjJ6YjJ6YjJ6YjJ6YjJ6YjJ6YjJ6YjJ6YjJ6/xT9IgzoKnwFNmISR8I/giphy.gif)
-_(Replace this with a real screenshot of your terminal!)_
-
 ## 🚀 Features
 
 - **Interactive File System**: Navigate with `cd`, `ls`, and `cat`.
