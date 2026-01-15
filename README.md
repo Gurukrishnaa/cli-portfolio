@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PortOS v1.0 (Beta) 🖥️
 
-## Getting Started
+> "It runs on Next.js but dreams of being a Linux distro."
 
-First, run the development server:
+A fully interactive **Terminal Portfolio** that turns your browser into a command-line interface. Built with Next.js, Tailwind CSS, and a love for retro aesthetics.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+![PortOS Terminal](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExcDdtY2J6eXF6YjJ6YjJ6YjJ6YjJ6YjJ6YjJ6YjJ6YjJ6YjJ6/xT9IgzoKnwFNmISR8I/giphy.gif)
+_(Replace this with a real screenshot of your terminal!)_
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Features
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Interactive File System**: Navigate with `cd`, `ls`, and `cat`.
+- **Real Email Protocol**: Send me a message directly from the terminal via `contact`.
+- **Minigames**:
+  - 🐍 `snake`: Slither around when you should be working.
+- **Themes**: Switch styles with `theme <name>` (Matrix, Drac, Cyber, Amber).
+- **Easter Eggs**: Try `sudo`, `rm -rf /`, or `test` (if you dare).
+- **Mobile Friendly**: Responsive design that works on phones (virtual keyboard support).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Usage
 
-## Learn More
+### Commands
 
-To learn more about Next.js, take a look at the following resources:
+| Command    | Description                               |
+| :--------- | :---------------------------------------- |
+| `help`     | List all available commands               |
+| `about`    | Display my graphical profile card         |
+| `projects` | List my work (clickable links)            |
+| `contact`  | Send me a secure email (Interactive Form) |
+| `theme`    | Change color scheme (try `theme matrix`)  |
+| `clear`    | Clean the terminal buffer                 |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📦 Installation & Setup
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1.  **Clone the repo**:
 
-## Deploy on Vercel
+    ```bash
+    git clone https://github.com/Gurukrishnaa/cli-portfolio.git
+    cd cli-portfolio
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+2.  **Install dependencies**:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+    ```bash
+    npm install
+    ```
+
+3.  **Environment Setup**:
+    Create a `.env.local` file for the email feature:
+
+    ```env
+    EMAIL_USER=your-email@gmail.com
+    EMAIL_PASS=your-google-app-password
+    ```
+
+4.  **Run Dev Server**:
+    ```bash
+    npm run dev
+    ```
+    Open `http://localhost:3000`.
+
+## ☁️ Deployment (Vercel)
+
+1.  Push your code to [GitHub](https://github.com/Gurukrishnaa/cli-portfolio).
+2.  Go to [Vercel](https://vercel.com) and "Import Project".
+3.  **Important**: Add your Environment Variables (`EMAIL_USER`, `EMAIL_PASS`) in the Vercel Dashboard settings.
+4.  Hit **Deploy**.
+
+## 👨‍💻 Credits
+
+Made with ❤️ and ☕ by **Guru Krishnaa**.
