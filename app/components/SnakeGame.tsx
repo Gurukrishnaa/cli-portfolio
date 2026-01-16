@@ -5,6 +5,7 @@ import { Theme } from '../utils/themes';
 
 interface SnakeGameProps {
   theme: Theme;
+  isMobile: boolean;
   onExit: () => void;
 }
 
@@ -13,7 +14,7 @@ type Point = { x: number; y: number };
 const GRID_SIZE = 20;
 const SPEED = 100;
 
-const SnakeGame: React.FC<SnakeGameProps> = ({ theme, onExit }) => {
+const SnakeGame: React.FC<SnakeGameProps> = ({ theme, isMobile, onExit }) => {
   const [snake, setSnake] = useState<Point[]>([{ x: 10, y: 10 }]);
   const [food, setFood] = useState<Point>({ x: 15, y: 10 });
   const [direction, setDirection] = useState<Point>({ x: 1, y: 0 }); // Moving right
@@ -143,14 +144,14 @@ const SnakeGame: React.FC<SnakeGameProps> = ({ theme, onExit }) => {
   }, [onExit]);
 
   return (
-    <div className={`w-full h-full flex flex-col items-center justify-center ${theme.text} p-4`}>
-      <div className="flex justify-between w-full max-w-[400px] mb-4 font-mono font-bold">
+    <div className={`w-full h-full flex flex-col items-center justify-center ${theme.text} p-4 overflow-y-auto`}>
+      <div className="flex justify-between w-full max-w-[400px] mb-4 font-mono font-bold shrink-0">
         <span>SCORE: {score}</span>
         <span>HIGH SCORE: {highScore}</span>
       </div>
 
       <div 
-        className={`relative bg-black/50 border-2 ${theme.border}`}
+        className={`relative bg-black/50 border-2 ${theme.border} shrink-0`}
         style={{
             width: 'min(80vw, 400px)',
             height: 'min(80vw, 400px)',
@@ -159,12 +160,6 @@ const SnakeGame: React.FC<SnakeGameProps> = ({ theme, onExit }) => {
             gridTemplateRows: `repeat(${GRID_SIZE}, 1fr)`
         }}
       >
-        {/* Render Grid Cells purely for logic or map collision? 
-            Actually mapped rendering is cleaner. 
-            We create an array of size GRID_SIZE * GRID_SIZE? 
-            Or just render Snake and Food absolutely? 
-            Grid/Flex is heavy for 400 divs? No, 400 divs is fine in React.
-        */}
         {Array.from({ length: GRID_SIZE * GRID_SIZE }).map((_, i) => {
             const x = i % GRID_SIZE;
             const y = Math.floor(i / GRID_SIZE);
@@ -187,26 +182,84 @@ const SnakeGame: React.FC<SnakeGameProps> = ({ theme, onExit }) => {
         
         {/* Game Over Overlay */}
         {gameOver && (
-            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-center backdrop-blur-sm">
+            <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center text-center backdrop-blur-sm z-10">
                 <h2 className="text-3xl font-bold mb-2">GAME OVER</h2>
                 <p className="mb-4">Final Score: {score}</p>
                 <div className="flex gap-4 text-sm animate-pulse">
-                    <span>[SPACE] Restart</span>
-                    <span>[ESC] Exit</span>
+                    <span>{isMobile ? 'Tap Restart' : '[SPACE] Restart'}</span>
+                    <span>{isMobile ? 'Tap Exit' : '[ESC] Exit'}</span>
                 </div>
+                {isMobile && (
+                   <div className="mt-4 flex gap-4">
+                        <button onClick={resetGame} className={`px-4 py-2 border ${theme.border} rounded hover:bg-white/10`}>Restart</button>
+                        <button onClick={onExit} className={`px-4 py-2 border ${theme.border} rounded hover:bg-white/10`}>Exit</button>
+                   </div>
+                )}
             </div>
         )}
         
         {isPaused && !gameOver && (
-            <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                 <h2 className="text-2xl font-bold animate-pulse">PAUSED</h2>
+            <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center z-10">
+                 <h2 className="text-2xl font-bold animate-pulse mb-4">PAUSED</h2>
+                 {isMobile && (
+                    <button onClick={() => setIsPaused(false)} className={`px-4 py-2 border ${theme.border} rounded bg-black/80`}>Resume</button>
+                 )}
             </div>
         )}
       </div>
 
-      <div className="mt-4 text-xs opacity-70 font-mono">
+      <div className="mt-4 text-xs opacity-70 font-mono shrink-0 hidden sm:block">
         Use Arrow Keys to Move • Space to Pause/Restart • Esc to Quit
       </div>
+
+      {/* Mobile Controls */}
+      {isMobile && (
+        <div className="mt-6 flex flex-col items-center gap-4 w-full max-w-[300px] shrink-0 touch-none">
+
+             <div className="grid grid-cols-3 gap-2">
+                <div />
+                <button 
+                    className={`w-14 h-14 border ${theme.border} rounded flex items-center justify-center active:bg-white/20 touch-manipulation text-xl font-bold`}
+                    onClick={() => directionRef.current.y !== 1 && setDirection({ x: 0, y: -1 })}
+                >
+                    ↑
+                </button>
+                <div />
+                
+                <button 
+                    className={`w-14 h-14 border ${theme.border} rounded flex items-center justify-center active:bg-white/20 touch-manipulation text-xl font-bold`}
+                    onClick={() => directionRef.current.x !== 1 && setDirection({ x: -1, y: 0 })}
+                >
+                    ←
+                </button>
+                <button 
+                     className={`w-14 h-14 border ${theme.border} rounded flex items-center justify-center active:bg-white/20 touch-manipulation text-xl font-bold`}
+                     onClick={() => setIsPaused(p => !p)}
+                >
+                    {isPaused ? '▶' : '⏸'}
+                </button>
+                <button 
+                    className={`w-14 h-14 border ${theme.border} rounded flex items-center justify-center active:bg-white/20 touch-manipulation text-xl font-bold`}
+                    onClick={() => directionRef.current.x !== -1 && setDirection({ x: 1, y: 0 })}
+                >
+                    →
+                </button>
+                
+                <div />
+                 <button 
+                    className={`w-14 h-14 border ${theme.border} rounded flex items-center justify-center active:bg-white/20 touch-manipulation text-xl font-bold`}
+                    onClick={() => directionRef.current.y !== -1 && setDirection({ x: 0, y: 1 })}
+                >
+                    ↓
+                </button>
+                <div />
+            </div>
+
+            <div className="flex gap-4 mt-2">
+                 <button onClick={onExit} className={`px-4 py-2 border ${theme.border} rounded text-sm hover:bg-white/10 active:bg-white/20`}>Exit Game</button>
+            </div>
+        </div>
+      )}
     </div>
   );
 };

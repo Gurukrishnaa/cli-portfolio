@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { processCommand, COMMANDS, CommandResponse, PROJECT_LIST } from '../utils/commands';
-import { ASCII_HEADER } from '../utils/ascii';
+import { ASCII_HEADER, ASCII_HEADER_MOBILE } from '../utils/ascii';
 import CyberBackground from './CyberBackground';
 import { FILE_SYSTEM, FileNode } from '../utils/fileSystem';
 import { THEMES, Theme } from '../utils/themes';
@@ -59,6 +59,9 @@ export default function Terminal() {
   // Cursor state
   const [cursorPos, setCursorPos] = useState(0);
 
+  // Mobile state
+  const [isMobile, setIsMobile] = useState(false);
+
   // Interaction Mode (e.g., 'command' or 'email')
   const [interactionMode, setInteractionMode] = useState<'command' | 'email'>('command');
   const [formStep, setFormStep] = useState(0); // 0: Idle, 1: Name, 2: Email, 3: Subject, 4: Message
@@ -67,15 +70,26 @@ export default function Terminal() {
   // Center the window on initial load with safe dimensions
   useEffect(() => {
     if (typeof window !== 'undefined') {
-        const initialWidth = Math.min(1100, window.innerWidth - 40);
-        const initialHeight = Math.min(700, window.innerHeight - 40);
-        
-        setSize({ width: initialWidth, height: initialHeight });
-        
-        setPosition({
-            x: (window.innerWidth - initialWidth) / 2,
-            y: (window.innerHeight - initialHeight) / 2
-        });
+        const checkMobile = () => {
+            const mobile = window.innerWidth < 768;
+            setIsMobile(mobile);
+            if (mobile) {
+                setSize({ width: window.innerWidth, height: window.innerHeight });
+                setPosition({ x: 0, y: 0 });
+            } else {
+                 const initialWidth = Math.min(1100, window.innerWidth - 40);
+                 const initialHeight = Math.min(700, window.innerHeight - 40);
+                 setSize({ width: initialWidth, height: initialHeight });
+                 setPosition({
+                    x: (window.innerWidth - initialWidth) / 2,
+                    y: (window.innerHeight - initialHeight) / 2
+                 });
+            }
+        };
+
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
     }
   }, []);
 
@@ -679,15 +693,23 @@ export default function Terminal() {
       {/* Terminal Window */}
       <div 
         ref={windowRef}
-        style={{ 
-            left: `${position.x}px`, 
-            top: `${position.y}px`,
-            width: `${size.width}px`,
-            height: isMinimized ? 'auto' : `${size.height}px`,
+        style={ isMobile ? {
+            left: 0,
+            top: 0,
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            border: 'none',
+            borderRadius: 0
+        } : { 
+            left: isMaximized ? 0 : `${position.x}px`, 
+            top: isMaximized ? 0 : `${position.y}px`,
+            width: isMaximized ? '100vw' : `${size.width}px`,
+            height: isMinimized ? 'auto' : (isMaximized ? '100vh' : `${size.height}px`),
             position: 'absolute',
             transition: isMaximized ? 'all 0.3s ease' : 'none'
         }}
-        className={`bg-black/10 backdrop-blur-sm rounded-lg ${theme.glow} border ${theme.border} flex flex-col overflow-hidden ${isMaximized ? 'rounded-none border-0' : ''}`}
+        className={`bg-black/90 backdrop-blur-md ${isMobile ? 'rounded-none border-0 shadow-none' : 'rounded-lg'} ${theme.glow} border ${theme.border} flex flex-col overflow-hidden ${isMaximized ? 'rounded-none border-0' : ''}`}
       >
         {/* Title Bar (Draggable Handle) */}
         <div 
@@ -712,7 +734,7 @@ export default function Terminal() {
             isBooting ? (
                 <BootSequence theme={theme} onComplete={() => setIsBooting(false)} />
             ) : isPlayingSnake ? (
-                <SnakeGame theme={theme} onExit={() => {
+                <SnakeGame theme={theme} isMobile={isMobile} onExit={() => {
                     setIsPlayingSnake(false);
                     // Refocus input after game
                     setTimeout(() => inputRef.current?.focus(), 100);
@@ -725,7 +747,7 @@ export default function Terminal() {
         >
             {/* ASCII Header */}
             <pre className={`${theme.text} font-bold mb-8 leading-none select-none text-[8px] sm:text-[10px] md:text-xs lg:text-sm xl:text-base opacity-80`}>
-                {ASCII_HEADER}
+                {isMobile ? ASCII_HEADER_MOBILE : ASCII_HEADER}
             </pre>
 
             {/* Welcome Message */}
@@ -816,7 +838,7 @@ export default function Terminal() {
                             : '›'}
                     </span>
                     
-                    <div className="relative flex-1">
+                    <div className="relative flex-1 min-w-0">
                         {/* Visual Custom Cursor Overlay */}
                         <div className="absolute inset-0 pointer-events-none flex whitespace-pre-wrap break-words items-center h-full">
                             <span className="text-white">{input.slice(0, cursorPos)}</span>
@@ -840,7 +862,7 @@ export default function Terminal() {
                             onChange={handleInputChange}
                             onKeyDown={handleKeyDown}
                             onSelect={handleSelect}
-                            className="w-full bg-transparent border-none outline-none text-transparent caret-transparent py-0 h-full cursor-text"
+                            className="w-full bg-transparent border-none outline-none text-transparent caret-transparent py-0 h-full cursor-text text-base sm:text-sm"
                             autoFocus
                             spellCheck={false}
                             autoComplete="off"
@@ -852,8 +874,8 @@ export default function Terminal() {
             )
         )}
         
-        {/* Resize Handle (Invisible but functional) - Disable if maximized or minimized */}
-        {!isMaximized && !isMinimized && (
+        {/* Resize Handle (Invisible but functional) - Disable if maximized, minimized or mobile */}
+        {!isMaximized && !isMinimized && !isMobile && (
         <div 
             onMouseDown={(e) => {
                 e.stopPropagation(); // Prevent drag start
